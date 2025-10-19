@@ -1,4 +1,4 @@
-#  TypeORM / Express / TypeScript RESTful API boilerplate
+# TypeORM / Express / TypeScript RESTful API boilerplate
 
 [![CI][build-badge]][build-url]
 [![TypeScript][typescript-badge]][typescript-url]
@@ -10,8 +10,48 @@ Boilerplate with focus on best practices and painless developer experience:
 - Minimal setup that can be extended 🔧
 - Spin it up with single command 🌀
 - TypeScript first
-- RESTful APIs
+- RESTful APIs (розширено модулем громадського транспорту)
 - JWT authentication with role based authorization
+
+## Transit Entities & Relationships
+
+- **TransportType ↔ Route**: один вид транспорту обслуговує багато маршрутів (`TransportType` ←→ `Route`).
+- **Route ↔ Transport / Schedule / RouteStop / RoutePoint / Trip**: маршрут об’єднує транспорт, розклад, послідовні зупинки та GPS-точки, а також поїздки.
+- **Transport ↔ DriverAssignment / Trip / VehicleGpsLog**: конкретний транспорт має призначення водіїв, поїздки та GPS-логи.
+- **Passenger ↔ TransportCard / ComplaintSuggestion / Fine / UserGpsLog**: пасажир володіє карткою, може купувати квитки, подавати скарги, отримувати штрафи і передавати координати.
+- **Trip ↔ Ticket / ComplaintSuggestion / Fine**: поїздка поєднує маршрут, транспорт, водія, квитки та звернення пасажирів.
+
+Усі сутності описані в `src/orm/entities/transit`, зв’язки реалізовані через декоратори TypeORM (`OneToMany`, `ManyToOne`, `OneToOne`) та відображені в міграції `src/orm/migrations/1760348623889-New_entitis.ts`.
+
+## REST API Endpoints (`/v1/transit`)
+
+- `GET /card-top-ups`, `GET /card-top-ups/:id`, `POST /card-top-ups`, `PATCH /card-top-ups/:id`, `DELETE /card-top-ups/:id`
+- `GET /complaint-suggestions`, `GET /complaint-suggestions/:id`, `POST /complaint-suggestions`, `PATCH /complaint-suggestions/:id`, `DELETE /complaint-suggestions/:id`
+- `GET /drivers`, `GET /drivers/:id`, `POST /drivers`, `PATCH /drivers/:id`, `DELETE /drivers/:id`
+- `GET /driver-assignments`, `GET /driver-assignments/:id`, `POST /driver-assignments`, `PATCH /driver-assignments/:id`, `DELETE /driver-assignments/:id`
+- `GET /fines`, `GET /fines/:id`, `POST /fines`, `PATCH /fines/:id`, `DELETE /fines/:id`
+- `GET /fine-appeals`, `GET /fine-appeals/:id`, `POST /fine-appeals`, `PATCH /fine-appeals/:id`, `DELETE /fine-appeals/:id`
+- `GET /passengers`, `GET /passengers/:id`, `POST /passengers`, `PATCH /passengers/:id`, `DELETE /passengers/:id`
+- `GET /routes`, `GET /routes/:id`, `POST /routes`, `PATCH /routes/:id`, `DELETE /routes/:id`
+- `GET /route-points`, `GET /route-points/:id`, `POST /route-points`, `PATCH /route-points/:id`, `DELETE /route-points/:id`
+- `GET /route-stops`, `GET /route-stops/:id`, `POST /route-stops`, `PATCH /route-stops/:id`, `DELETE /route-stops/:id`
+- `GET /schedules`, `GET /schedules/:id`, `POST /schedules`, `PATCH /schedules/:id`, `DELETE /schedules/:id`
+- `GET /stops`, `GET /stops/:id`, `POST /stops`, `PATCH /stops/:id`, `DELETE /stops/:id`
+- `GET /tickets`, `GET /tickets/:id`, `POST /tickets`, `PATCH /tickets/:id`, `DELETE /tickets/:id`
+- `GET /transports`, `GET /transports/:id`, `POST /transports`, `PATCH /transports/:id`, `DELETE /transports/:id`
+- `GET /transport-cards`, `GET /transport-cards/:id`, `POST /transport-cards`, `PATCH /transport-cards/:id`, `DELETE /transport-cards/:id`
+- `GET /transport-types`, `GET /transport-types/:id`, `POST /transport-types`, `PATCH /transport-types/:id`, `DELETE /transport-types/:id`
+- `GET /trips`, `GET /trips/:id`, `POST /trips`, `PATCH /trips/:id`, `DELETE /trips/:id`
+- `GET /user-gps-logs`, `GET /user-gps-logs/:id`, `POST /user-gps-logs`, `PATCH /user-gps-logs/:id`, `DELETE /user-gps-logs/:id`
+- `GET /vehicle-gps-logs`, `GET /vehicle-gps-logs/:id`, `POST /vehicle-gps-logs`, `PATCH /vehicle-gps-logs/:id`, `DELETE /vehicle-gps-logs/:id`
+
+Кожний роут реалізує повний CRUD через узагальнені контролери (`src/controllers/transit`) та сервіси (`src/services/transit`). `ConfiguredCrudService` підключає `relations`, тому відповіді містять пов’язані сутності.
+
+## Postman Evidence
+
+![Trip response with related data](docs/screenshots/trip-with-relations.png)
+![Passenger create response](docs/screenshots/passenger-create.png)
+![Transport list](docs/screenshots/transport-list.png)
 
 ## Requirements
 
