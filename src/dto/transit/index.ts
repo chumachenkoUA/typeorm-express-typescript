@@ -167,3 +167,5 @@ export type CreateVehicleGpsLogDto = {
 };
 
 export type UpdateVehicleGpsLogDto = Partial<CreateVehicleGpsLogDto>;
+
+export * from './responses';
